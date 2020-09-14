@@ -3,6 +3,7 @@
 # Fail our pipe if any command fails
 set -eo pipefail
 
+RELEASE="v0.1.1"
 KUBE_ARGS=()
 while [[ $# -gt 0 ]];
 do
@@ -26,7 +27,8 @@ done
 if hash lolcat &> /dev/null \
 		&& hash cowsay &> /dev/null; then
 		# Set COWPATH to get the correct cowsay ascii art
-		COWPATH="$(dirname $0)"
+		# Look in the .krew/store directory for our plugin folder
+		COWPATH="$(dirname $0)/../store/exterminate/$RELEASE/"
 			kubectl get po --no-headers --output=name ${KUBE_ARGS[@]} \
 				| xargs shuf -n1 -e \
 				| xargs kubectl delete ${KUBE_ARGS[@]} \
@@ -39,6 +41,6 @@ else
 	hash lolcat
 	kubectl get po --no-headers --output=name ${KUBE_ARGS[@]} \
 				| xargs shuf -n1 -e \
-				| xargs kubectl delete ${KUBE_ARGS[@]} 
+				| xargs kubectl delete ${KUBE_ARGS[@]}
 fi
 
