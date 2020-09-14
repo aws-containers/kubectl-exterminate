@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Fail our pipe if any command fails
+set -eo pipefail
+
+KUBE_ARGS=()
+while [[ $# -gt 0 ]];
+do
+    opt="$1";
+    shift;              #expose next argument
+    case "$opt" in
+				# handle both --namespace=foo and -n foo
+				"--namespace="* )
+					KUBE_ARGS=(-n "${opt#*=}");;
+        "--namespace" | "-n" )
+					KUBE_ARGS=(-n "$1"); shift;;
+				"--help" | "-h" )
+					echo "EXTERMINATE a random pod."
+					echo "Use -n \$NAMESPACE to scope to a namespace"
+					exit 0
+					;;
+		esac
+done
+
+# Check if lolcat and cowsay are installed
+if hash lolcat &> /dev/null \
+		&& hash cowsay &> /dev/null; then
+		# Set COWPATH to get the correct cowsay ascii art
+		COWPATH="$(dirname $0)"
+			kubectl get po --no-headers --output=name ${KUBE_ARGS[@]} \
+				| xargs shuf -n1 -e \
+				| xargs kubectl delete ${KUBE_ARGS[@]} \
+				| sed 's/deleted/EXTERMINATED/g' \
+				| cowsay -f dalek \
+				| lolcat
+else
+	echo "Please install all dependancies"
+	hash cowsay
+	hash lolcat
+	kubectl get po --no-headers --output=name ${KUBE_ARGS[@]} \
+				| xargs shuf -n1 -e \
+				| xargs kubectl delete ${KUBE_ARGS[@]} 
+fi
+
