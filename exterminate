@@ -28,12 +28,11 @@ if hash lolcat &> /dev/null \
 		&& hash cowsay &> /dev/null; then
 		# Set COWPATH to get the correct cowsay ascii art
 		# Look in the .krew/store directory for our plugin folder
-		COWPATH="$(dirname $0)/../store/exterminate/$RELEASE/"
 			kubectl get po --no-headers --output=name ${KUBE_ARGS[@]} \
 				| xargs shuf -n1 -e \
 				| xargs kubectl delete ${KUBE_ARGS[@]} \
 				| sed 's/deleted/EXTERMINATED/g' \
-				| cowsay -f dalek \
+				| cowsay \
 				| lolcat
 else
 	echo "Please install all dependancies"
